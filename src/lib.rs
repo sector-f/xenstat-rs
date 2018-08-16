@@ -198,10 +198,35 @@ impl Domain {
     }
 
     /// Get the network handle for a given network
-    pub fn networks(&self, network: u32) -> Network {
+    pub fn network(&self, network: u32) -> Network {
         unsafe {
             Network {
                 ptr: sys::xenstat_domain_network(self.ptr, network),
+            }
+        }
+    }
+
+    /// Get the number of VBDs
+    pub fn num_vbds(&self) -> u32 {
+        unsafe {
+            sys::xenstat_domain_num_vbds(self.ptr)
+        }
+    }
+
+    /// Get the VBD handle to obtain VBD stats
+    pub fn vbd(&self, vbd: u32) -> Vbd {
+        unsafe {
+            Vbd {
+                ptr: sys::xenstat_domain_vbd(self.ptr, vbd),
+            }
+        }
+    }
+
+    /// Get the tmem information for a given domain
+    pub fn tmem(&self) -> Tmem {
+        unsafe {
+            Tmem {
+                ptr: sys::xenstat_domain_tmem(self.ptr),
             }
         }
     }
@@ -240,6 +265,12 @@ pub struct Network {
 
 pub struct Vbd {
     ptr: *mut sys::xenstat_vbd,
+}
+
+pub enum VbdType {
+    Unidentified,
+    BlkBack,
+    BlkTap,
 }
 
 pub struct Tmem {
