@@ -236,6 +236,20 @@ pub struct DomainState {
     pub dying: bool,
 }
 
+impl DomainState {
+    /// Print the DomainState in the same format as `xm list`
+    pub fn print(&self) -> String {
+        format!("{}{}{}{}{}{}",
+            if self.dying { "d" } else { "-" },
+            if self.shutdown { "s" } else { "-" },
+            if self.blocked { "b" } else { "-" },
+            if self.crashed { "c" } else { "-" },
+            if self.paused { "p" } else { "-" },
+            if self.running { "r" } else { "-" }
+        )
+    }
+}
+
 pub struct Vcpu {
     ptr: *mut sys::xenstat_vcpu,
 }
