@@ -179,20 +179,13 @@ impl Domain {
     /// Get the domain state
     pub fn state(&self) -> DomainState {
         unsafe {
-            if sys::xenstat_domain_running(self.ptr) == 0 {
-                DomainState::Running
-            } else if sys::xenstat_domain_blocked(self.ptr) == 0 {
-                DomainState::Blocked
-            } else if sys::xenstat_domain_paused(self.ptr) == 0 {
-                DomainState::Paused
-            } else if sys::xenstat_domain_shutdown(self.ptr) == 0 {
-                DomainState::Shutdown
-            } else if sys::xenstat_domain_crashed(self.ptr) == 0 {
-                DomainState::Crashed
-            } else if sys::xenstat_domain_dying(self.ptr) == 0 {
-                DomainState::Dying
-            } else {
-                DomainState::Unknown
+            DomainState {
+                running: sys::xenstat_domain_running(self.ptr) == 0,
+                blocked: sys::xenstat_domain_blocked(self.ptr) == 0,
+                paused: sys::xenstat_domain_paused(self.ptr) == 0,
+                shutdown: sys::xenstat_domain_shutdown(self.ptr) == 0,
+                crashed: sys::xenstat_domain_crashed(self.ptr) == 0,
+                dying: sys::xenstat_domain_dying(self.ptr) == 0,
             }
         }
     }
@@ -214,14 +207,13 @@ impl Domain {
     }
 }
 
-pub enum DomainState {
-    Running,
-    Blocked,
-    Paused,
-    Shutdown,
-    Crashed,
-    Dying,
-    Unknown,
+pub struct DomainState {
+    pub running: bool,
+    pub blocked: bool,
+    pub paused: bool,
+    pub shutdown: bool,
+    pub crashed: bool,
+    pub dying: bool,
 }
 
 pub struct Vcpu {
