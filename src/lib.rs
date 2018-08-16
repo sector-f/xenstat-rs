@@ -2,11 +2,6 @@ extern crate xenstat_sys as sys;
 use std::ops::Drop;
 use std::ffi::CStr;
 
-// #define XENSTAT_VCPU 0x1
-// #define XENSTAT_NETWORK 0x2
-// #define XENSTAT_XEN_VERSION 0x4
-// #define XENSTAT_VBD 0x8
-
 // 0x1 | 0x2 | 0x4 | 0x8
 const NODE_FLAGS: u32 = sys::XENSTAT_VCPU | sys::XENSTAT_NETWORK | sys::XENSTAT_XEN_VERSION | sys::XENSTAT_VBD;
 
@@ -263,8 +258,123 @@ pub struct Network {
     ptr: *mut sys::xenstat_network,
 }
 
+impl Network {
+    /// Get the ID for this network
+    pub fn id(&self) -> u32 {
+        unsafe {
+            sys::xenstat_network_id(self.ptr)
+        }
+    }
+
+    /// Get the number of receive bytes for this network
+    pub fn rbytes(&self) -> u64 {
+        unsafe {
+            sys::xenstat_network_rbytes(self.ptr)
+        }
+    }
+
+    /// Get the number of receive packets for this network
+    pub fn rpackets(&self) -> u64 {
+        unsafe {
+            sys::xenstat_network_rpackets(self.ptr)
+        }
+    }
+
+    /// Get the number of receive errors for this network
+    pub fn rerrs(&self) -> u64 {
+        unsafe {
+            sys::xenstat_network_rerrs(self.ptr)
+        }
+    }
+
+    /// Get the number of receive drops for this network
+    pub fn rdrop(&self) -> u64 {
+        unsafe {
+            sys::xenstat_network_rdrop(self.ptr)
+        }
+    }
+
+    /// Get the number of transmit bytes for this network
+    pub fn tbytes(&self) -> u64 {
+        unsafe {
+            sys::xenstat_network_tbytes(self.ptr)
+        }
+    }
+
+    /// Get the number of transmit packets for this network
+    pub fn tpackets(&self) -> u64 {
+        unsafe {
+            sys::xenstat_network_tpackets(self.ptr)
+        }
+    }
+
+    /// Get the number of transmit errors for this network
+    pub fn terrs(&self) -> u64 {
+        unsafe {
+            sys::xenstat_network_terrs(self.ptr)
+        }
+    }
+
+    /// Get the number of transmit drops for this network
+    pub fn tdrop(&self) -> u64 {
+        unsafe {
+            sys::xenstat_network_tdrop(self.ptr)
+        }
+    }
+}
+
 pub struct Vbd {
     ptr: *mut sys::xenstat_vbd,
+}
+
+impl Vbd {
+    pub fn get_type(&self) -> VbdType {
+        unsafe {
+            match sys::xenstat_vbd_type(self.ptr) {
+                0 => VbdType::Unidentified,
+                1 => VbdType::BlkBack,
+                2 => VbdType::BlkTap,
+                _ => unreachable!("xenstat_vbd_type returned invalid value"),
+            }
+        }
+    }
+
+    /// Get the device number for the Virtual Block Device
+    pub fn vbd_dev(&self) -> u32 {
+        unsafe {
+            sys::xenstat_vbd_dev(self.ptr)
+        }
+    }
+
+    pub fn oo_reqs(&self) -> u64 {
+        unsafe {
+            sys::xenstat_vbd_oo_reqs(self.ptr)
+        }
+    }
+
+    pub fn rd_reqs(&self) -> u64 {
+        unsafe {
+            sys::xenstat_vbd_rd_reqs(self.ptr)
+        }
+    }
+
+    pub fn wr_reqs(&self) -> u64 {
+        unsafe {
+            sys::xenstat_vbd_wr_reqs(self.ptr)
+        }
+    }
+
+    pub fn rd_sects(&self) -> u64 {
+        unsafe {
+            sys::xenstat_vbd_rd_sects(self.ptr)
+        }
+    }
+
+    pub fn wr_sects(&self) -> u64 {
+        unsafe {
+            sys::xenstat_vbd_wr_sects(self.ptr)
+        }
+    }
 }
 
 pub enum VbdType {
@@ -275,4 +385,31 @@ pub enum VbdType {
 
 pub struct Tmem {
     ptr: *mut sys::xenstat_tmem,
+}
+
+// TODO: Figure out what these do and give them better names
+impl Tmem {
+    pub fn curr_eph_pages(&self) -> u64 {
+        unsafe {
+            sys::xenstat_tmem_curr_eph_pages(self.ptr)
+        }
+    }
+
+    pub fn succ_eph_gets(&self) -> u64 {
+        unsafe {
+            sys::xenstat_tmem_succ_eph_gets(self.ptr)
+        }
+    }
+
+    pub fn succ_pers_puts(&self) -> u64 {
+        unsafe {
+            sys::xenstat_tmem_succ_pers_puts(self.ptr)
+        }
+    }
+
+    pub fn succ_pers_gets(&self) -> u64 {
+        unsafe {
+            sys::xenstat_tmem_succ_pers_gets(self.ptr)
+        }
+    }
 }
